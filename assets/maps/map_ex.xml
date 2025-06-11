@@ -1,0 +1,61 @@
+<map version='0.1.Lite' size='1000x1000'>
+	<background>
+		<image>keherbeker</image>
+		<music volume='50'>Sunset</music>
+	</background>
+	<static-geometry>
+		<prop lib='animated' name='img1 seq'>
+			<position>
+				<x>3</x>
+				<y>2</y>
+			</position>
+			<layer>0</layer>
+		</prop>
+		<prop lib='static' name='sprWoodWallInteriorH'>
+			<position>
+				<x>1</x>
+				<y>2</y>
+			</position>
+			<layer>0</layer>
+		</prop>
+	</static-geometry>
+	<collision-geometry>
+		<collision-rect>
+			<size>
+				<width>10</width>
+				<height>10</height>				
+			</size>
+			<position>
+				<x>0</x>
+				<y>0</y>
+			</position>
+			<rotation>0</rotation>
+		</collision-rect>
+		<collision-mask lib='animated' name='img1 seq'>
+			<position>
+				<x>0</x>
+				<y>0</y>
+			</position>
+			<rotation>0</rotation>
+		</collision-mask>
+	</collision-geometry>
+	<spawn-points>
+		<spawn type="player spawn" id="0">
+			<position>
+				<x>0</x>
+				<y>0</y>
+			</position>
+			<rotation>0</rotation>
+		</spawn>
+		<spawn type="enemy spawn" id="0">
+			<position>
+				<x>0</x>
+				<y>0</y>
+			</position>
+			<rotation>0</rotation>
+		</spawn>
+	</spawn-points>
+	<bonus-regions>
+		<!-- Здесь пока ничего трогать не буду -->
+	</bonus-regions>
+</map>

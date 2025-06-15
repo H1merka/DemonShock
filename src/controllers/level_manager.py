@@ -1,6 +1,7 @@
 # controllers/level_manager.py
 
-from models.wave_manager import WaveManager
+from src.controllers.wave_manager import WaveManager
+
 
 class LevelManager:
     def __init__(self):

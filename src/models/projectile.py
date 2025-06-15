@@ -1,8 +1,9 @@
 # models/projectile.py
 
 import pygame
-import math
-from settings import WEAPON_DAMAGE
+import os
+from src.models.settings import WEAPON_DAMAGE, WEAPON_SPRITES_DIR
+
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, pos, target_pos, speed, damage, image_path):
@@ -31,27 +32,32 @@ class Projectile(pygame.sprite.Sprite):
 
 # === Классы снарядов ===
 
+
 class Bullet(Projectile):
     def __init__(self, pos, target_pos):
-        super().__init__(pos, target_pos, speed=600, damage=WEAPON_DAMAGE["Pistol"], image_path="assets/weapons/bullet.png")
+        super().__init__(pos, target_pos, speed=600, damage=WEAPON_DAMAGE["Pistol"], image_path=os.path.join(WEAPON_SPRITES_DIR, "bullet.png"))
+
 
 class RifleBullet(Projectile):
     def __init__(self, pos, target_pos):
-        super().__init__(pos, target_pos, speed=800, damage=WEAPON_DAMAGE["Rifle"], image_path="assets/weapons/rifle_bullet.png")
+        super().__init__(pos, target_pos, speed=800, damage=WEAPON_DAMAGE["Rifle"], image_path=os.path.join(WEAPON_SPRITES_DIR, "bullet.png"))
+
 
 class PlasmaBolt(Projectile):
     def __init__(self, pos, target_pos):
-        super().__init__(pos, target_pos, speed=500, damage=WEAPON_DAMAGE["PlasmaRifle"], image_path="assets/weapons/plasma_bolt.png")
+        super().__init__(pos, target_pos, speed=500, damage=WEAPON_DAMAGE["PlasmaRifle"], image_path=os.path.join(WEAPON_SPRITES_DIR, "plasma_bolt.png"))
+
 
 class Grenade(Projectile):
     def __init__(self, pos, target_pos):
-        super().__init__(pos, target_pos, speed=400, damage=WEAPON_DAMAGE["GrenadeLauncher"], image_path="assets/weapons/grenade.png")
+        super().__init__(pos, target_pos, speed=400, damage=WEAPON_DAMAGE["GrenadeLauncher"], image_path=os.path.join(WEAPON_SPRITES_DIR, "grenade.png"))
 
     def update(self, dt):
         super().update(dt)
         # В будущем: реализовать взрыв по таймеру или столкновению
 
 # === Вспомогательная функция ===
+
 
 def create_projectile(weapon_name, pos, target_pos):
     if weapon_name == "Pistol":

@@ -1,14 +1,14 @@
 # main.py
 
 import pygame
-from settings import *
-from controllers.input_handler import InputHandler
-from controllers.audio_controller import AudioManager
-from controllers.level_manager import LevelManager
-from views.menu_view import draw_main_menu, handle_menu_events
-from views.pause_view import draw_pause_menu, handle_pause_events
-from views.game_view import draw_game
-from models.player import Player
+from src.models.settings import *
+from src.controllers.input_handler import InputHandler
+from src.controllers.audio_controller import AudioManager
+from src.controllers.level_manager import LevelManager
+from src.views.menu_view import draw_main_menu, handle_menu_events
+from src.views.pause_view import draw_pause_menu, handle_pause_events
+from src.views.game_view import draw_game
+from src.models.player import Player
 
 def main():
     pygame.init()

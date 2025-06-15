@@ -1,10 +1,12 @@
 # controllers/audio_controller.py
 
 import pygame
+from src.models.settings import DEFAULT_MUSIC_VOLUME, DEFAULT_SFX_VOLUME
+
 
 class AudioManager:
-    _music_volume = 0.5
-    _sfx_volume = 0.7
+    _music_volume = DEFAULT_MUSIC_VOLUME
+    _sfx_volume = DEFAULT_SFX_VOLUME
 
     _current_music = None
     _sfx_cache = {}

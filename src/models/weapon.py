@@ -1,7 +1,9 @@
 # models/weapon.py
 
 import pygame
-from models.projectile import create_projectile
+from src.models.projectile import create_projectile
+from src.models.settings import WEAPON_SPRITES_DIR
+
 
 class Weapon:
     def __init__(self, name, damage, cooldown, projectile_type):
@@ -9,20 +11,23 @@ class Weapon:
         self.damage = damage
         self.cooldown = cooldown  # в миллисекундах
         self.projectile_type = projectile_type
-        self.icon = pygame.image.load(f"assets/weapons/{name.lower()}_icon.png").convert_alpha()
+        self.icon = pygame.image.load(WEAPON_SPRITES_DIR + f"{name.lower()}_icon.png").convert_alpha()
 
     def fire(self, start_pos, target_pos, projectiles_group):
         projectile = create_projectile(self.name, start_pos, target_pos)
         if projectile:
             projectiles_group.add(projectile)
 
+
 class Pistol(Weapon):
     def __init__(self):
         super().__init__(name="Pistol", damage=1, cooldown=400, projectile_type="Bullet")
 
+
 class Rifle(Weapon):
     def __init__(self):
         super().__init__(name="Rifle", damage=3, cooldown=700, projectile_type="RifleBullet")
+
 
 class AssaultRifle(Weapon):
     def __init__(self):
@@ -38,9 +43,11 @@ class AssaultRifle(Weapon):
                 projectile.rect.y += i * 2
                 projectiles_group.add(projectile)
 
+
 class PlasmaRifle(Weapon):
     def __init__(self):
         super().__init__(name="PlasmaRifle", damage=4, cooldown=600, projectile_type="PlasmaBolt")
+
 
 class GrenadeLauncher(Weapon):
     def __init__(self):

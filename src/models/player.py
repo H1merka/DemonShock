@@ -1,14 +1,14 @@
 # models/player.py
 
 import pygame
-from settings import PLAYER_SPEED, PLAYER_HEALTH, SCREEN_WIDTH, SCREEN_HEIGHT
-from models.projectile import create_projectile
-from models.weapon import Pistol, Rifle, AssaultRifle, PlasmaRifle, GrenadeLauncher
+from src.models.settings import PLAYER_SPEED, PLAYER_HEALTH, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE_DIR
+from src.models.weapon import Pistol, Rifle, AssaultRifle, PlasmaRifle, GrenadeLauncher
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        self.image = pygame.image.load("assets/sprites/player.png").convert_alpha()
+        self.image = pygame.image.load(SPRITE_DIR + "player.png").convert_alpha()
         self.rect = self.image.get_rect(center=pos)
 
         self.speed = PLAYER_SPEED

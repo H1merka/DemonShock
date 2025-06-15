@@ -1,8 +1,9 @@
 # models/enemy.py
 
 import pygame
-import random
-from settings import TILE_SIZE
+from src.models.settings import ENEMY_HEALTH, BOSS_HEALTH, SPRITE_DIR
+import os
+
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos, health, speed, image_path):
@@ -30,11 +31,12 @@ class Enemy(pygame.sprite.Sprite):
 
 class Jumper(Enemy):
     def __init__(self, pos):
-        super().__init__(pos, health=2, speed=250, image_path="assets/sprites/enemies/jumper.png")
+        super().__init__(pos, health=ENEMY_HEALTH, speed=250, image_path=os.path.join(SPRITE_DIR, "enemies", "jumper.png"))
+
 
 class Shooter(Enemy):
     def __init__(self, pos):
-        super().__init__(pos, health=2, speed=120, image_path="assets/sprites/enemies/shooter.png")
+        super().__init__(pos, health=ENEMY_HEALTH, speed=120, image_path=os.path.join(SPRITE_DIR, "enemies", "shooter.png"))
         self.shoot_timer = 0
 
     def update(self, player_pos, dt):
@@ -45,17 +47,20 @@ class Shooter(Enemy):
             # Логика выстрела в игрока
             # Вызывается из GameController — отслеживает врагов с типом Shooter
 
+
 class Warrior(Enemy):
     def __init__(self, pos):
-        super().__init__(pos, health=2, speed=180, image_path="assets/sprites/enemies/warrior.png")
+        super().__init__(pos, health=ENEMY_HEALTH, speed=180, image_path=os.path.join(SPRITE_DIR, "enemies", "warrior.png"))
+
 
 class Tank(Enemy):
     def __init__(self, pos):
-        super().__init__(pos, health=4, speed=80, image_path="assets/sprites/enemies/tank.png")
+        super().__init__(pos, health=(ENEMY_HEALTH*2), speed=80, image_path=os.path.join(SPRITE_DIR, "enemies", "tank.png"))
+
 
 class Summoner(Enemy):
     def __init__(self, pos):
-        super().__init__(pos, health=2, speed=100, image_path="assets/sprites/enemies/summoner.png")
+        super().__init__(pos, health=ENEMY_HEALTH, speed=100, image_path=os.path.join(SPRITE_DIR, "enemies", "summoner.png"))
         self.summon_timer = 0
 
     def update(self, player_pos, dt):
@@ -72,11 +77,12 @@ class Summoner(Enemy):
 
 class Boss(Enemy):
     def __init__(self, pos, image_path):
-        super().__init__(pos, health=100, speed=60, image_path=image_path)
+        super().__init__(pos, health=BOSS_HEALTH, speed=60, image_path=image_path)
+
 
 class BossShooter(Boss):
     def __init__(self, pos):
-        super().__init__(pos, image_path="assets/sprites/bosses/boss_shooter.png")
+        super().__init__(pos, image_path=os.path.join(SPRITE_DIR, "bosses", "boss_shooter.png"))
         self.shoot_timer = 0
 
     def update(self, player_pos, dt):
@@ -87,13 +93,15 @@ class BossShooter(Boss):
             return "shoot"  # Сигнал для GameController
         return None
 
+
 class BossTank(Boss):
     def __init__(self, pos):
-        super().__init__(pos, image_path="assets/sprites/bosses/boss_tank.png")
+        super().__init__(pos, image_path=os.path.join(SPRITE_DIR, "bosses", "boss_tank.png"))
+
 
 class BossSummoner(Boss):
     def __init__(self, pos):
-        super().__init__(pos, image_path="assets/sprites/bosses/boss_summoner.png")
+        super().__init__(pos, image_path=os.path.join(SPRITE_DIR, "bosses", "boss_summoner.png"))
         self.summon_timer = 0
 
     def update(self, player_pos, dt):

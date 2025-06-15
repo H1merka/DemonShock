@@ -1,5 +1,3 @@
-# settings.py
-
 import os
 
 # Экран
@@ -53,9 +51,6 @@ WEAPON_DAMAGE = {
     "AssaultRifle": 1,
     "PlasmaRifle": 4,
     "GrenadeLauncher": 5
-}
-BURST_SHOTS = {
-    "AssaultRifle": 3  # очередь из 3 выстрелов
 }
 
 # Настройки базы данных

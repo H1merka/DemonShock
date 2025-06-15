@@ -1,8 +1,8 @@
 # database.py
 import sqlite3
 import os
+from src.models.settings import DB_PATH
 
-DB_PATH = "saves/game_save.db"
 
 class SaveManager:
     def __init__(self):

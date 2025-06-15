@@ -1,6 +1,7 @@
 # views/ui_elements.py
 
 import pygame
+from src.models.settings import FONT_PATH
 
 
 class Button:
@@ -15,7 +16,7 @@ class Button:
         self.hover_color = (180, 0, 0)
         self.text_color = (255, 255, 255)
 
-        self.font = pygame.font.Font("assets/fonts/rus_font.ttf", font_size)
+        self.font = pygame.font.Font(FONT_PATH, font_size)
         self.text = self.font.render(text, True, self.text_color)
         self.text_rect = self.text.get_rect(center=self.rect.center)
 

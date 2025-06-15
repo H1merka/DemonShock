@@ -2,6 +2,7 @@
 
 import pygame
 
+
 class InputHandler:
     def __init__(self):
         # Состояние клавиш для движения

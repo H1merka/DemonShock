@@ -1,6 +1,8 @@
 # views/game_view.py
 
 import pygame
+from src.models.settings import FONT_PATH
+
 
 class GameView:
     def __init__(self, screen, tilemap, player, enemies, projectiles, boss=None):
@@ -19,7 +21,7 @@ class GameView:
         self.projectiles = projectiles
         self.boss = boss
 
-        self.font = pygame.font.Font("assets/fonts/rus_font.ttf", 24)
+        self.font = pygame.font.Font(FONT_PATH, 24)
         self.boss_hp_bar_rect = pygame.Rect(20, 20, 300, 25)
 
     def draw(self):

@@ -1,12 +1,14 @@
 # models/wave_manager.py
 
 import random
-from models.enemy import Jumper, Shooter, Warrior, Tank, Summoner
+from src.models.enemy import Jumper, Shooter, Warrior, Tank, Summoner
+from src.models.settings import WAVES_PER_LEVEL, ENEMY_SCALE_FACTOR
+
 
 class WaveManager:
     def __init__(self, level=1):
         self.level = level
-        self.waves_per_level = 5  # 5 волн на уровень — по типу врагов
+        self.waves_per_level = WAVES_PER_LEVEL  # 5 волн на уровень — по типу врагов
         self.current_wave = 0
         self.enemies_to_spawn = []
         self.active_enemies = []
@@ -34,7 +36,7 @@ class WaveManager:
 
     def calculate_enemy_count(self):
         # Увеличение врагов каждые 3 уровня
-        multiplier = 1.0 + 0.5 * ((self.level - 1) // 3)
+        multiplier = ENEMY_SCALE_FACTOR * ((self.level - 1) // 3)
         return int(self.base_enemy_count * multiplier)
 
     def create_enemy(self, enemy_class):

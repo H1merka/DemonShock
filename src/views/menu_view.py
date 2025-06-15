@@ -1,13 +1,15 @@
 # views/menu_view.py
 
 import pygame
-from views.ui_elements import Button, Slider
-from controllers.audio_controller import AudioManager
+from src.views.ui_elements import Button, Slider
+from src.controllers.audio_controller import AudioManager
+from src.models.settings import UI_DIR, FONT_PATH
+
 
 class MainMenu:
     def __init__(self, screen, on_new_game, on_continue_game, on_quit):
         self.screen = screen
-        self.bg = pygame.image.load("assets/ui/main_menu_bg.png").convert()
+        self.bg = pygame.image.load(UI_DIR + "main_menu_bg.png").convert()
 
         self.on_new_game = on_new_game
         self.on_continue_game = on_continue_game
@@ -31,7 +33,7 @@ class MainMenu:
         self.draw_volume_label()
 
     def draw_volume_label(self):
-        font = pygame.font.Font("assets/fonts/rus_font.ttf", 24)
+        font = pygame.font.Font(FONT_PATH, 24)
         text = font.render("Громкость музыки", True, (255, 255, 255))
         self.screen.blit(text, (self.volume_slider.rect.x, self.volume_slider.rect.y - 30))
 

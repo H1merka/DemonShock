@@ -1,8 +1,10 @@
 # views/pause_view.py
 
 import pygame
-from views.ui_elements import Button, Slider
-from controllers.audio_controller import AudioManager
+from src.views.ui_elements import Button, Slider
+from src.controllers.audio_controller import AudioManager
+from src.models.settings import FONT_PATH
+
 
 class PauseMenu:
     def __init__(self, screen, on_resume, on_save, on_quit_to_menu):
@@ -29,7 +31,7 @@ class PauseMenu:
 
     def draw(self):
         self.screen.blit(self.bg, (0, 0))
-        font = pygame.font.Font("assets/fonts/rus_font.ttf", 36)
+        font = pygame.font.Font(FONT_PATH, 36)
         title = font.render("Пауза", True, (255, 255, 255))
         title_rect = title.get_rect(center=(self.screen.get_width() // 2, 150))
         self.screen.blit(title, title_rect)
@@ -41,7 +43,7 @@ class PauseMenu:
         self.draw_volume_label()
 
     def draw_volume_label(self):
-        font = pygame.font.Font("assets/fonts/rus_font.ttf", 24)
+        font = pygame.font.Font(FONT_PATH, 24)
         text = font.render("Громкость музыки", True, (255, 255, 255))
         self.screen.blit(text, (self.volume_slider.x, self.volume_slider.y - 30))
 

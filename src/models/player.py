@@ -3,6 +3,7 @@
 import pygame
 from src.models.settings import PLAYER_SPEED, PLAYER_HEALTH, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE_DIR
 from src.models.weapon import Pistol, Rifle, AssaultRifle, PlasmaRifle, GrenadeLauncher
+from src.controllers.audio_controller import AudioManager
 
 
 class Player(pygame.sprite.Sprite):
@@ -16,6 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.weapon = Pistol()
         self.last_shot_time = 0
         self.shot_cooldown = self.weapon.cooldown
+        self.is_moving = False
 
     def update(self, keys_pressed, dt):
         self.handle_movement(keys_pressed, dt)
@@ -30,6 +32,15 @@ class Player(pygame.sprite.Sprite):
             dx = -self.speed
         if keys[pygame.K_d]:
             dx = self.speed
+
+        is_now_moving = dx != 0 or dy != 0
+
+        if is_now_moving and not self.is_moving:
+            AudioManager.play_step_sfx()
+        elif not is_now_moving and self.is_moving:
+            AudioManager.stop_step_sfx()
+
+        self.is_moving = is_now_moving
 
         self.rect.x += dx * dt
         self.rect.y += dy * dt

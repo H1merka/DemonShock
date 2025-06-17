@@ -3,6 +3,7 @@
 import pygame
 from src.models.projectile import create_projectile
 from src.models.settings import WEAPON_SPRITES_DIR
+from src.controllers.audio_controller import AudioManager
 
 
 class Weapon:
@@ -17,6 +18,7 @@ class Weapon:
         projectile = create_projectile(self.name, start_pos, target_pos)
         if projectile:
             projectiles_group.add(projectile)
+            AudioManager.play_weapon_sfx(self.name)
 
 
 class Pistol(Weapon):
@@ -42,6 +44,7 @@ class AssaultRifle(Weapon):
                 projectile.rect.x += i * 2
                 projectile.rect.y += i * 2
                 projectiles_group.add(projectile)
+        AudioManager.play_weapon_sfx(self.name)
 
 
 class PlasmaRifle(Weapon):

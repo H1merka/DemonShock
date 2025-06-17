@@ -1,6 +1,7 @@
 # controllers/level_manager.py
 
 from src.controllers.wave_manager import WaveManager
+from src.controllers.audio_controller import AudioManager
 
 
 class LevelManager:
@@ -23,7 +24,9 @@ class LevelManager:
     def on_wave_cleared(self):
         """Вызывается, когда волна очищена"""
         if not self.wave_manager.next_wave():
-            # Все волны пройдены - появляется босс
+            # Все волны пройдены — появляется босс
+            boss_type = self.get_current_boss_type()
+            AudioManager.play_boss_spawn_sfx(boss_type)  # Проигрываем звук
             return True  # сигнал к появлению босса
         return False
 

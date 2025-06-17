@@ -13,17 +13,41 @@ from src.models.player import Player
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Demonic Invasion Shooter")
+    pygame.display.set_caption("DemonShock")
     clock = pygame.time.Clock()
+    icon_surface = pygame.image.load(ICON_PATH).convert_alpha()
+    pygame.display.set_icon(icon_surface)
 
     # Инициализация аудио
     AudioManager.init()
     # Запускаем музыку главного меню
-    AudioManager.play_music('assets/music/menu_theme.ogg')
+    AudioManager.play_music(MUSIC_DIR+'menu.ogg')
+
+    # Загрузка звуков оружия
+    AudioManager.load_weapon_sfx("Pistol", SFX_DIR+"pistol.wav")
+    AudioManager.load_weapon_sfx("Rifle", SFX_DIR+"rifle.wav")
+    AudioManager.load_weapon_sfx("AssaultRifle", SFX_DIR+"pistol.wav")
+    AudioManager.load_weapon_sfx("PlasmaRifle", SFX_DIR+"plasma.wav")
+    AudioManager.load_weapon_sfx("GrenadeLauncher", SFX_DIR+"r launch.wav")
+
+    # Загрузка звуков появления врагов
+    AudioManager.load_enemy_spawn_sfx("jumper", SFX_DIR + "jumper.wav")
+    AudioManager.load_enemy_spawn_sfx("shooter", SFX_DIR + "shooter.wav")
+    AudioManager.load_enemy_spawn_sfx("warrior", SFX_DIR + "warrior.wav")
+    AudioManager.load_enemy_spawn_sfx("tank", SFX_DIR + "tank.wav")
+    AudioManager.load_enemy_spawn_sfx("summoner", SFX_DIR + "summoner.wav")
+
+    # Загрузка звуков появления боссов
+    AudioManager.load_boss_spawn_sfx("ShooterBoss", SFX_DIR+"boss_shooter.wav")
+    AudioManager.load_boss_spawn_sfx("TankBoss", SFX_DIR+"boss_tank.wav")
+    AudioManager.load_boss_spawn_sfx("SummonerBoss", SFX_DIR+"boss_summoner.wav")
+
+    # ====== Загрузка звука шагов ======
+    AudioManager.load_step_sfx(SFX_DIR + "footstep_loop.wav")  # <- добавлено
 
     input_handler = InputHandler()
     level_manager = LevelManager()
-    player = Player(x=SCREEN_WIDTH//2, y=SCREEN_HEIGHT//2)
+    player = Player(pos=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
 
     game_state = 'menu'  # menu, playing, paused
     running = True
@@ -50,8 +74,8 @@ def main():
                 AudioManager.set_music_volume(0.3)  # приглушить музыку в паузе
 
             # Обновление игрока
-            move_x, move_y = input_handler.get_movement_vector()
-            player.update(move_x, move_y, input_handler.is_shooting)
+            player.update(input_handler.get_movement_vector(), dt=clock.get_time()/1000)  # передаём dt в секунды
+            # здесь можно добавить player.shoot(...) если нужно
 
             # Обновление уровня и волн
             level_manager.update()

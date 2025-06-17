@@ -3,6 +3,7 @@
 import random
 from src.models.enemy import Jumper, Shooter, Warrior, Tank, Summoner
 from src.models.settings import WAVES_PER_LEVEL, ENEMY_SCALE_FACTOR
+from src.controllers.audio_controller import AudioManager
 
 
 class WaveManager:
@@ -51,6 +52,11 @@ class WaveManager:
             # Можно задать случайную позицию в зоне спавна
             enemy.rect.x, enemy.rect.y = self.get_spawn_position()
             self.active_enemies.append(enemy)
+
+            # Воспроизводим звук появления в зависимости от класса
+            enemy_type = type(enemy).__name__.lower()  # Пример: "jumper"
+            AudioManager.play_enemy_spawn_sfx(enemy_type)
+
             return enemy
         return None
 

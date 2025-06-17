@@ -4,7 +4,6 @@ import os
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 FPS = 60
-TITLE = "Demonic Invasion"
 
 # Цвета
 WHITE = (255, 255, 255)

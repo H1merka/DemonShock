@@ -1,7 +1,5 @@
-# models/player.py
-
 import pygame
-from src.models.settings import PLAYER_SPEED, PLAYER_HEALTH, SCREEN_WIDTH, SCREEN_HEIGHT, SPRITE_DIR
+from src.models.settings import PLAYER_SPEED, PLAYER_HEALTH, SPRITE_DIR
 from src.models.weapon import Pistol, Rifle, AssaultRifle, PlasmaRifle, GrenadeLauncher
 from src.controllers.audio_controller import AudioManager
 
@@ -9,7 +7,7 @@ from src.controllers.audio_controller import AudioManager
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        self.image = pygame.image.load(SPRITE_DIR + "player.png").convert_alpha()
+        self.image = pygame.image.load(SPRITE_DIR + "/player.png").convert_alpha()
         self.rect = self.image.get_rect(center=pos)
 
         self.speed = PLAYER_SPEED
@@ -19,19 +17,22 @@ class Player(pygame.sprite.Sprite):
         self.shot_cooldown = self.weapon.cooldown
         self.is_moving = False
 
-    def update(self, keys_pressed, dt):
-        self.handle_movement(keys_pressed, dt)
+        self.collision_mask = None  # маска коллизий карты
+        self.collision_surface = None  # поверхность карты (для отладки)
 
-    def handle_movement(self, keys, dt):
-        dx, dy = 0, 0
-        if keys[pygame.K_w]:
-            dy = -self.speed
-        if keys[pygame.K_s]:
-            dy = self.speed
-        if keys[pygame.K_a]:
-            dx = -self.speed
-        if keys[pygame.K_d]:
-            dx = self.speed
+    def set_collision_mask(self, surface_or_mask):
+        """Устанавливает маску коллизий на основе поверхности или маски"""
+        if isinstance(surface_or_mask, pygame.Surface):
+            self.collision_mask = pygame.mask.from_threshold(surface_or_mask, (0, 0, 0), (10, 10, 10))
+            self.collision_surface = surface_or_mask
+        elif isinstance(surface_or_mask, pygame.Mask):
+            self.collision_mask = surface_or_mask
+
+    def update(self, movement_vector, dt):
+        self.handle_movement(movement_vector, dt)
+
+    def handle_movement(self, movement_vector, dt):
+        dx, dy = movement_vector
 
         is_now_moving = dx != 0 or dy != 0
 
@@ -42,11 +43,24 @@ class Player(pygame.sprite.Sprite):
 
         self.is_moving = is_now_moving
 
-        self.rect.x += dx * dt
-        self.rect.y += dy * dt
+        if dx == 0 and dy == 0:
+            return
 
-        # Ограничения экрана
-        self.rect.clamp_ip(pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
+        new_rect = self.rect.copy()
+        new_rect.x += dx * self.speed * dt
+        if not self.collides_with_map(new_rect):
+            self.rect.x = new_rect.x
+
+        new_rect.y += dy * self.speed * dt
+        if not self.collides_with_map(new_rect):
+            self.rect.y = new_rect.y
+
+    def collides_with_map(self, rect):
+        if self.collision_mask is None:
+            return False
+        offset = (int(rect.left), int(rect.top))
+        player_mask = pygame.mask.from_surface(self.image)
+        return self.collision_mask.overlap(player_mask, offset) is not None
 
     def shoot(self, target_pos, current_time, projectiles_group):
         if current_time - self.last_shot_time >= self.weapon.cooldown:

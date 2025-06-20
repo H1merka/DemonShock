@@ -18,7 +18,6 @@ class SaveManager:
             CREATE TABLE IF NOT EXISTS save_data (
                 id INTEGER PRIMARY KEY,
                 level INTEGER,
-                wave INTEGER,
                 health INTEGER,
                 weapon TEXT,
                 music_volume REAL
@@ -26,24 +25,23 @@ class SaveManager:
         """)
         self.conn.commit()
 
-    def save_game(self, level, wave, health, weapon_name, music_volume):
+    def save_game(self, level, health, weapon_name, music_volume):
         self.cursor.execute("DELETE FROM save_data")
         self.cursor.execute("""
-            INSERT INTO save_data (level, wave, health, weapon, music_volume)
-            VALUES (?, ?, ?, ?, ?)
-        """, (level, wave, health, weapon_name, music_volume))
+            INSERT INTO save_data (level, health, weapon, music_volume)
+            VALUES (?, ?, ?, ?)
+        """, (level, health, weapon_name, music_volume))
         self.conn.commit()
 
     def load_last_game(self):
-        self.cursor.execute("SELECT level, wave, health, weapon, music_volume FROM save_data LIMIT 1")
+        self.cursor.execute("SELECT level, health, weapon, music_volume FROM save_data LIMIT 1")
         result = self.cursor.fetchone()
         if result:
             return {
                 'level': result[0],
-                'wave': result[1],
-                'health': result[2],
-                'weapon': result[3],
-                'music_volume': result[4]
+                'health': result[1],
+                'weapon': result[2],
+                'music_volume': result[3]
             }
         return None
 

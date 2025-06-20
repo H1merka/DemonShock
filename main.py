@@ -1,14 +1,14 @@
-# main.py
-
 import pygame
 from src.models.settings import *
 from src.controllers.input_handler import InputHandler
 from src.controllers.audio_controller import AudioManager
 from src.controllers.level_manager import LevelManager
-from src.views.menu_view import draw_main_menu, handle_menu_events
-from src.views.pause_view import draw_pause_menu, handle_pause_events
-from src.views.game_view import draw_game
+from src.views.menu_view import MainMenu
+from src.views.pause_view import PauseMenu
+from src.views.game_view import GameView
 from src.models.player import Player
+from src.models.database import SaveManager
+
 
 def main():
     pygame.init()
@@ -21,79 +21,154 @@ def main():
     # Инициализация аудио
     AudioManager.init()
     # Запускаем музыку главного меню
-    AudioManager.play_music(MUSIC_DIR+'menu.ogg')
+    AudioManager.play_music(MUSIC_DIR+'/menu.ogg')
 
     # Загрузка звуков оружия
-    AudioManager.load_weapon_sfx("Pistol", SFX_DIR+"pistol.wav")
-    AudioManager.load_weapon_sfx("Rifle", SFX_DIR+"rifle.wav")
-    AudioManager.load_weapon_sfx("AssaultRifle", SFX_DIR+"pistol.wav")
-    AudioManager.load_weapon_sfx("PlasmaRifle", SFX_DIR+"plasma.wav")
-    AudioManager.load_weapon_sfx("GrenadeLauncher", SFX_DIR+"r launch.wav")
+    AudioManager.load_weapon_sfx("Pistol", SFX_DIR+"/pistol.wav")
+    AudioManager.load_weapon_sfx("Rifle", SFX_DIR+"/rifle.wav")
+    AudioManager.load_weapon_sfx("AssaultRifle", SFX_DIR+"/pistol.wav")
+    AudioManager.load_weapon_sfx("PlasmaRifle", SFX_DIR+"/plasma.wav")
+    AudioManager.load_weapon_sfx("GrenadeLauncher", SFX_DIR+"/rlaunch.wav")
 
     # Загрузка звуков появления врагов
-    AudioManager.load_enemy_spawn_sfx("jumper", SFX_DIR + "jumper.wav")
-    AudioManager.load_enemy_spawn_sfx("shooter", SFX_DIR + "shooter.wav")
-    AudioManager.load_enemy_spawn_sfx("warrior", SFX_DIR + "warrior.wav")
-    AudioManager.load_enemy_spawn_sfx("tank", SFX_DIR + "tank.wav")
-    AudioManager.load_enemy_spawn_sfx("summoner", SFX_DIR + "summoner.wav")
+    AudioManager.load_enemy_spawn_sfx("jumper", SFX_DIR + "/jumper.wav")
+    AudioManager.load_enemy_spawn_sfx("shooter", SFX_DIR + "/shooter.wav")
+    AudioManager.load_enemy_spawn_sfx("warrior", SFX_DIR + "/warrior.wav")
+    AudioManager.load_enemy_spawn_sfx("tank", SFX_DIR + "/tank.wav")
+    AudioManager.load_enemy_spawn_sfx("summoner", SFX_DIR + "/summoner.wav")
 
     # Загрузка звуков появления боссов
-    AudioManager.load_boss_spawn_sfx("ShooterBoss", SFX_DIR+"boss_shooter.wav")
-    AudioManager.load_boss_spawn_sfx("TankBoss", SFX_DIR+"boss_tank.wav")
-    AudioManager.load_boss_spawn_sfx("SummonerBoss", SFX_DIR+"boss_summoner.wav")
+    AudioManager.load_boss_spawn_sfx("ShooterBoss", SFX_DIR+"/boss_shooter.wav")
+    AudioManager.load_boss_spawn_sfx("TankBoss", SFX_DIR+"/boss_tank.wav")
+    AudioManager.load_boss_spawn_sfx("SummonerBoss", SFX_DIR+"/boss_summoner.wav")
 
     # ====== Загрузка звука шагов ======
-    AudioManager.load_step_sfx(SFX_DIR + "footstep_loop.wav")  # <- добавлено
+    AudioManager.load_step_sfx(SFX_DIR + "/steps.wav")  # <- добавлено
 
     input_handler = InputHandler()
     level_manager = LevelManager()
+    save_manager = SaveManager()
     player = Player(pos=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+    game_view = None  # инициализируем позже, после старта уровня
 
     game_state = 'menu'  # menu, playing, paused
     running = True
 
-    while running:
-        clock.tick(FPS)
-        input_handler.process_events()
+    # Функции-заглушки для обработки кнопок меню
+    def start_game():
+        nonlocal game_state, game_view
+        game_state = 'playing'
+        AudioManager.play_music(MUSIC_DIR+'/abyss.ogg')
+        level_manager.start_level()
 
-        if input_handler.quit_requested:
-            running = False
+        map_surface = level_manager.get_map_surface()
+        player.set_collision_mask(level_manager.get_collision_mask())
+
+        game_view = GameView(
+            screen=screen,
+            map=map_surface,
+            player=player,
+            enemies=level_manager.get_sprite_groups()["enemies"],
+            projectiles=level_manager.get_projectile_group(),
+            boss=level_manager.get_entities()["boss"]
+        )
+
+    def continue_game():
+        # Добавь логику загрузки/продолжения, если нужно
+        nonlocal game_state, game_view
+        saved = save_manager.load_last_game()
+        if saved:
+            level_manager.start_level(saved['level'])
+            player.health = saved['health']
+            player.switch_weapon(saved['weapon'])
+            AudioManager.set_music_volume(saved['music_volume'])
+            AudioManager.play_music(MUSIC_DIR + '/abyss.ogg')
+
+            map_surface = level_manager.get_map_surface()
+            player.set_collision_mask(level_manager.get_collision_mask())
+
+            game_view = GameView(
+                screen=screen,
+                map=map_surface,
+                player=player,
+                enemies=level_manager.get_sprite_groups()["enemies"],
+                projectiles=level_manager.get_projectile_group(),
+                boss=level_manager.get_entities()["boss"]
+            )
+            game_state = 'playing'
+
+    def quit_game():
+        nonlocal running
+        running = False
+
+    def resume_game():
+        nonlocal game_state
+        game_state = 'playing'
+        AudioManager.set_music_volume(0.7)
+
+    def save_game():
+        current_weapon = player.weapon.name if player.weapon else "Pistol"
+        save_manager.save_game(
+            level=level_manager.current_level,
+            health=player.health,
+            weapon_name=current_weapon,
+            music_volume=AudioManager.get_music_volume()
+        )
+
+    def quit_to_menu():
+        nonlocal game_state
+        game_state = 'menu'
+        AudioManager.play_music(MUSIC_DIR + '/menu.ogg')
+
+    # Объекты меню
+    menu = MainMenu(screen, on_new_game=start_game, on_continue_game=continue_game, on_quit=quit_game)
+    pause_menu = PauseMenu(screen, on_resume=resume_game, on_save=save_game, on_quit_to_menu=quit_to_menu)
+
+    while running:
+        event_list = pygame.event.get()
+
+        input_handler.process_events(event_list)
+
+        for event in event_list:
+            if event.type == pygame.QUIT:
+                running = False
 
         if game_state == 'menu':
-            handle_menu_events(input_handler)
-            draw_main_menu(screen)
-            # Логика запуска игры по нажатию
-            if input_handler.is_shooting:  # например, начать по пробелу/клику
-                game_state = 'playing'
-                AudioManager.play_music('assets/music/level1_theme.ogg')
-                level_manager.start_level()
+            menu.handle_events(event_list)
+            menu.draw()
 
         elif game_state == 'playing':
             if input_handler.pause_requested:
                 game_state = 'paused'
-                AudioManager.set_music_volume(0.3)  # приглушить музыку в паузе
+                AudioManager.set_music_volume(0.3)
 
-            # Обновление игрока
-            player.update(input_handler.get_movement_vector(), dt=clock.get_time()/1000)  # передаём dt в секунды
-            # здесь можно добавить player.shoot(...) если нужно
+            dt = clock.tick(FPS) / 1000
 
-            # Обновление уровня и волн
-            level_manager.update()
+            player.update(input_handler.get_movement_vector(), dt=dt)
+            level_manager.update(dt)
 
-            # Отрисовка игрового экрана
-            draw_game(screen, player, level_manager)
+            # === Стрельба по нажатию мыши ===
+            if pygame.mouse.get_pressed()[0]:  # ЛКМ
+                mouse_pos = pygame.mouse.get_pos()
+                current_time = pygame.time.get_ticks()
+                player.shoot(mouse_pos, current_time, level_manager.get_projectile_group())
+
+            # === Обновление game_view ===
+            if game_view:
+                game_view.enemies = level_manager.get_sprite_groups()["enemies"]
+                game_view.projectiles = level_manager.get_projectile_group()
+                game_view.boss = level_manager.get_entities()["boss"]
+                game_view.draw()
 
         elif game_state == 'paused':
-            handle_pause_events(input_handler)
-            draw_pause_menu(screen)
-            if not input_handler.pause_requested:
-                # Вернуться в игру по ESC или кнопке в меню паузы
-                game_state = 'playing'
-                AudioManager.set_music_volume(0.7)
+            pause_menu.handle_events(event_list)
+            pause_menu.draw()
 
         pygame.display.flip()
 
+    save_manager.close()
     pygame.quit()
+
 
 if __name__ == "__main__":
     main()

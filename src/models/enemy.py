@@ -1,5 +1,3 @@
-# models/enemy.py
-
 import pygame
 from src.models.settings import ENEMY_HEALTH, BOSS_HEALTH, SPRITE_DIR
 import os

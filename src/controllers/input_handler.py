@@ -21,11 +21,11 @@ class InputHandler:
         self.pause_requested = False
         self.quit_requested = False
 
-    def process_events(self):
+    def process_events(self, events):
         self.pause_requested = False  # сброс перед новым циклом
         self.quit_requested = False
 
-        for event in pygame.event.get():
+        for event in events:
             if event.type == pygame.QUIT:
                 self.quit_requested = True
 

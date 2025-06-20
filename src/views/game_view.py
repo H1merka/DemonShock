@@ -1,11 +1,9 @@
-# views/game_view.py
-
 import pygame
-from src.models.settings import FONT_PATH
+from src.models.settings import FONT_PATH, SCREEN_WIDTH, SCREEN_HEIGHT
 
 
 class GameView:
-    def __init__(self, screen, tilemap, player, enemies, projectiles, boss=None):
+    def __init__(self, screen, map, player, enemies, projectiles, boss=None):
         """
         screen: pygame.Surface - основное окно
         tilemap: TileMap или структура с тайлами уровня
@@ -15,7 +13,7 @@ class GameView:
         boss: объект босса (если есть)
         """
         self.screen = screen
-        self.tilemap = tilemap
+        self.map = map
         self.player = player
         self.enemies = enemies
         self.projectiles = projectiles
@@ -23,36 +21,45 @@ class GameView:
 
         self.font = pygame.font.Font(FONT_PATH, 24)
         self.boss_hp_bar_rect = pygame.Rect(20, 20, 300, 25)
+        self.camera_offset = pygame.Vector2(0, 0)
+
+        # Размеры карты
+        self.map_width = self.map.get_width()
+        self.map_height = self.map.get_height()
 
     def draw(self):
         self.screen.fill((0, 0, 0))  # фон (черный или другой)
 
-        # Отрисовка карты
+        # === Обновление смещения камеры ===
+        self.camera_offset.x = self.player.rect.centerx - SCREEN_WIDTH // 2
+        self.camera_offset.y = self.player.rect.centery - SCREEN_HEIGHT // 2
+
+        # Ограничиваем камеру, чтобы не показывать область за пределами карты
+        self.camera_offset.x = max(0, min(self.camera_offset.x, self.map_width - SCREEN_WIDTH))
+        self.camera_offset.y = max(0, min(self.camera_offset.y, self.map_height - SCREEN_HEIGHT))
+
         self.draw_map()
 
-        # Отрисовка персонажа
-        self.screen.blit(self.player.sprite, self.player.rect)
+        # Игрок
+        player_pos = self.player.rect.topleft - self.camera_offset
+        self.screen.blit(self.player.image, player_pos)
 
-        # Отрисовка врагов
+        # Враги
         for enemy in self.enemies:
-            self.screen.blit(enemy.sprite, enemy.rect)
+            enemy_pos = enemy.rect.topleft - self.camera_offset
+            self.screen.blit(enemy.image, enemy_pos)
 
-        # Отрисовка снарядов
+        # Снаряды
         for proj in self.projectiles:
-            self.screen.blit(proj.sprite, proj.rect)
+            proj_pos = proj.rect.topleft - self.camera_offset
+            self.screen.blit(proj.image, proj_pos)
 
-        # Отрисовка HUD
         self.draw_health()
         if self.boss:
             self.draw_boss_hp()
 
     def draw_map(self):
-        # Предполагается, что tilemap — это 2D массив тайлов
-        tile_size = 64  # размер тайла
-        for y, row in enumerate(self.tilemap):
-            for x, tile in enumerate(row):
-                if tile:  # tile — Surface
-                    self.screen.blit(tile, (x * tile_size, y * tile_size))
+        self.screen.blit(self.map, (-self.camera_offset.x, -self.camera_offset.y))
 
     def draw_health(self):
         # Отрисовка здоровья игрока в виде сердечек или полосы
@@ -70,3 +77,8 @@ class GameView:
 
         boss_text = self.font.render("Босс", True, (255, 255, 255))
         self.screen.blit(boss_text, (self.boss_hp_bar_rect.x, self.boss_hp_bar_rect.y - 30))
+
+    def update_map_image(self, new_map):
+        self.map = new_map
+        self.map_width = self.map.get_width()
+        self.map_height = self.map.get_height()

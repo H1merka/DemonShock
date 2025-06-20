@@ -5,7 +5,7 @@ from src.models.settings import FONT_PATH
 
 
 class Button:
-    def __init__(self, text, center_pos, callback, width=200, height=50, font_size=28):
+    def __init__(self, text, center_pos, callback, width=200, height=50, font_size=50):
         self.callback = callback
         self.width = width
         self.height = height
@@ -15,6 +15,8 @@ class Button:
         self.base_color = (100, 0, 0)
         self.hover_color = (180, 0, 0)
         self.text_color = (255, 255, 255)
+        self.border_color = (0, 0, 0)  # Черный цвет рамки
+        self.border_width = 3           # Толщина рамки
 
         self.font = pygame.font.Font(FONT_PATH, font_size)
         self.text = self.font.render(text, True, self.text_color)
@@ -23,7 +25,11 @@ class Button:
     def draw(self, screen):
         mouse_pos = pygame.mouse.get_pos()
         color = self.hover_color if self.rect.collidepoint(mouse_pos) else self.base_color
+        # Рисуем саму кнопку
         pygame.draw.rect(screen, color, self.rect, border_radius=12)
+        # Рисуем черную рамку поверх кнопки
+        pygame.draw.rect(screen, self.border_color, self.rect, width=self.border_width, border_radius=12)
+        # Рисуем текст
         screen.blit(self.text, self.text_rect)
 
     def handle_event(self, event):
@@ -42,6 +48,8 @@ class Slider:
 
         self.value = max(0.0, min(1.0, initial_value))
         self.dragging = False
+
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def draw(self, screen):
         pygame.draw.rect(screen, (60, 60, 60), self.track_rect)

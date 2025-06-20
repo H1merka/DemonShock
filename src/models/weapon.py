@@ -1,5 +1,3 @@
-# models/weapon.py
-
 import pygame
 from src.models.projectile import create_projectile
 from src.models.settings import WEAPON_SPRITES_DIR
@@ -12,7 +10,7 @@ class Weapon:
         self.damage = damage
         self.cooldown = cooldown  # в миллисекундах
         self.projectile_type = projectile_type
-        self.icon = pygame.image.load(WEAPON_SPRITES_DIR + f"{name.lower()}_icon.png").convert_alpha()
+        self.icon = pygame.image.load(WEAPON_SPRITES_DIR + f"/{name.lower()}_icon.png").convert_alpha()
 
     def fire(self, start_pos, target_pos, projectiles_group):
         projectile = create_projectile(self.name, start_pos, target_pos)

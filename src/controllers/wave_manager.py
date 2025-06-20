@@ -1,5 +1,4 @@
-# models/wave_manager.py
-
+import pygame
 import random
 from src.models.enemy import Jumper, Shooter, Warrior, Tank, Summoner
 from src.models.settings import WAVES_PER_LEVEL, ENEMY_SCALE_FACTOR
@@ -13,6 +12,10 @@ class WaveManager:
         self.current_wave = 0
         self.enemies_to_spawn = []
         self.active_enemies = []
+
+        # === Группы спрайтов ===
+        self.enemy_group = pygame.sprite.Group()
+        self.boss_group = pygame.sprite.Group()  # если ты спавнишь босса отдельно
 
         # Количество врагов растёт на 1.5 раза каждые 3 уровня
         self.base_enemy_count = 5
@@ -29,6 +32,7 @@ class WaveManager:
         # Создаём список врагов для спавна
         self.enemies_to_spawn = [self.create_enemy(enemy_type) for _ in range(enemy_count)]
         self.active_enemies = []
+        self.enemy_group.empty()  # очищаем группу перед новой волной
 
     def get_enemy_type_for_wave(self, wave_idx):
         # 0: Jumper, 1: Shooter, 2: Warrior, 3: Tank, 4: Summoner
@@ -52,6 +56,7 @@ class WaveManager:
             # Можно задать случайную позицию в зоне спавна
             enemy.rect.x, enemy.rect.y = self.get_spawn_position()
             self.active_enemies.append(enemy)
+            self.enemy_group.add(enemy)  # добавляем во враги
 
             # Воспроизводим звук появления в зависимости от класса
             enemy_type = type(enemy).__name__.lower()  # Пример: "jumper"
@@ -88,3 +93,9 @@ class WaveManager:
     def next_level(self):
         self.level += 1
         self.start_level()
+
+    def get_sprite_groups(self):
+        return {
+            "enemies": self.enemy_group,
+            "bosses": self.boss_group
+        }

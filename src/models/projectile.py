@@ -1,5 +1,3 @@
-# models/projectile.py
-
 import pygame
 import os
 from src.models.settings import WEAPON_DAMAGE, WEAPON_SPRITES_DIR
